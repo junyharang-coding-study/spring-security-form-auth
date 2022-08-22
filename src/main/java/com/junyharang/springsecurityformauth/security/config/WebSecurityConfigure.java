@@ -49,7 +49,7 @@ public class WebSecurityConfigure {
     @Bean public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/", "/signup").permitAll()
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/user/**").hasRole("USER")
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/manager/**").hasRole("MANAGER")
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/admin/**").hasRole("ADMIN")
