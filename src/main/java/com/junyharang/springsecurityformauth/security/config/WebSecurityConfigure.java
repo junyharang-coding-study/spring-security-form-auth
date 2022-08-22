@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,8 +20,7 @@ public class WebSecurityConfigure {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(BCryptPasswordEncoder passwordEncoder) {
+    @Bean public UserDetailsService userDetailsService(BCryptPasswordEncoder passwordEncoder) {
         /* Memory에 임시 사용자 계정 생성을 위한 객체 생성 */
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
 
@@ -35,19 +35,18 @@ public class WebSecurityConfigure {
 
         manager.createUser(User.withUsername("manager")
                 .password(password)
-                .roles("MANAGER")
+                .roles("USER", "MANAGER")
                 .build());
 
         manager.createUser(User.withUsername("admin")
                 .password(password)
-                .roles("ADMIN")
+                .roles("USER", "MANAGER", "ADMIN")
                 .build());
 
         return manager;
     }
 
-    @Bean
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    @Bean public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
@@ -59,5 +58,10 @@ public class WebSecurityConfigure {
                 .formLogin();
 
         return http.build();
+    }
+
+    @Bean public WebSecurityCustomizer webSecurityCustomizer() {
+        /* /resources 하위 Directory는 보안 심사를 무시하고, 통과 시킨다. */
+        return (web) -> web.ignoring().antMatchers("/resources/**");
     }
 }
