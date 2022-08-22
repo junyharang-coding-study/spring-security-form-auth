@@ -1,15 +1,16 @@
 package com.junyharang.springsecurityformauth.controller.user;
 
+import com.junyharang.springsecurityformauth.constant.ServiceURIManagement;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/api/v1/user")
+@RequestMapping(ServiceURIManagement.NOW_VERSION + "/user")
 @Controller
 public class UserController {
 
     @GetMapping("/my-page")
     public String myPage() throws Exception {
-        return "user/my-page";
+        return "/api/v1/user/my-page";
     }
 }
