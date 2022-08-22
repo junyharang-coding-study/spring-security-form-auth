@@ -1,52 +1,45 @@
 package com.junyharang.springsecurityformauth.security.config;
 
 import com.junyharang.springsecurityformauth.constant.ServiceURIManagement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
+@RequiredArgsConstructor
 @EnableWebSecurity          // Spring Security 설정 활성화
 @Configuration
-public class WebSecurityConfigure {
+public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
-    @Bean public BCryptPasswordEncoder passwordEncoder() {     /* Password Hash 암호화 기능 사용을 위한 객체 주입 */
-        return new BCryptPasswordEncoder();
+    private final UserDetailsService userDetailsService;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean public UserDetailsService userDetailsService(BCryptPasswordEncoder passwordEncoder) {
-        /* Memory에 임시 사용자 계정 생성을 위한 객체 생성 */
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-
-        /* Password 암호화 */
-        String password = passwordEncoder.encode("1234");
-
-        /* 사용자 ID 생성 */
-        manager.createUser(User.withUsername("user")
-                .password(password)
-                .roles("USER")
-                .build());
-
-        manager.createUser(User.withUsername("manager")
-                .password(password)
-                .roles("USER", "MANAGER")
-                .build());
-
-        manager.createUser(User.withUsername("admin")
-                .password(password)
-                .roles("USER", "MANAGER", "ADMIN")
-                .build());
-
-        return manager;
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
     }
 
-    @Bean public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
+    @Override
+    protected void configure(final HttpSecurity http) throws Exception {
+        CharacterEncodingFilter filter = new CharacterEncodingFilter();
         http
                 .authorizeRequests()
                 .antMatchers("/", "/signup").permitAll()
@@ -54,14 +47,8 @@ public class WebSecurityConfigure {
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/manager/**").hasRole("MANAGER")
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
+
                 .and()
                 .formLogin();
-
-        return http.build();
-    }
-
-    @Bean public WebSecurityCustomizer webSecurityCustomizer() {
-        /* /resources 하위 Directory는 보안 심사를 무시하고, 통과 시킨다. */
-        return (web) -> web.ignoring().antMatchers("/resources/**");
     }
 }
