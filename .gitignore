@@ -62,7 +62,7 @@ hs_err_pid*
 replay_pid*
 
 # Spring boot
-application.properties
+src/main/resources/application.yml
 application.yml
 
 ### macOS ###
