@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @EnableWebSecurity          // Spring Security 설정 활성화
@@ -23,6 +24,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Autowired private AuthenticationDetailsSource authenticationDetailsSource;
+    @Autowired private AuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,6 +65,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/signin_proc")
                 .authenticationDetailsSource(authenticationDetailsSource)
                 .defaultSuccessUrl("/")
+                .successHandler(authenticationSuccessHandler)
                 .permitAll();
     }
 }
