@@ -8,6 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RequiredArgsConstructor
 @Controller
 public class UserController {
@@ -27,6 +30,18 @@ public class UserController {
     @PostMapping("/signup")
     public String createUser(SignUpRequestDTO signUpRequestDTO) {
         userService.createUser(signUpRequestDTO);
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/signin")
+    public String signIn() {
+        return "/signin";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        userService.logout(request, response);
 
         return "redirect:/";
     }

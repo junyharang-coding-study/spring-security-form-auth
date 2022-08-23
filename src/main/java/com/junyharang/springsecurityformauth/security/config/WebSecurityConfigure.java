@@ -51,7 +51,12 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
 
-                .and()
-                .formLogin();
+        .and()
+                .formLogin()
+                /* 개발자가 만든 로그인 Page 관련 설정 */
+                .loginPage("/signin")
+                .loginProcessingUrl("/signin_proc")
+                .defaultSuccessUrl("/")
+                .permitAll();
     }
 }
