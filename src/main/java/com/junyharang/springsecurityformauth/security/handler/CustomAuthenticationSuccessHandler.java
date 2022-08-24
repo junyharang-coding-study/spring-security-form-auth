@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessHandler {
+@Component public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private RequestCache requestCache = new HttpSessionRequestCache();      // 이용자가 현재 요청을 보내기 전 거쳐왔던 정보를 담은 객체
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();

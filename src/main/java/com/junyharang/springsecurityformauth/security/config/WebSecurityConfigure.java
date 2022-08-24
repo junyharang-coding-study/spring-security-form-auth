@@ -2,7 +2,6 @@ package com.junyharang.springsecurityformauth.security.config;
 
 import com.junyharang.springsecurityformauth.constant.ServiceURIManagement;
 import com.junyharang.springsecurityformauth.security.provider.CustomAuthenticationProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
@@ -25,6 +25,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Autowired private AuthenticationDetailsSource authenticationDetailsSource;
     @Autowired private AuthenticationSuccessHandler authenticationSuccessHandler;
+    @Autowired private AuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -52,7 +53,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         CharacterEncodingFilter filter = new CharacterEncodingFilter();
         http
                 .authorizeRequests()
-                .antMatchers("/", "/signup").permitAll()
+                .antMatchers("/", "/signup", "/signin/**", "/signin*").permitAll()
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/user/**").hasRole("USER")
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/manager/**").hasRole("MANAGER")
                 .antMatchers(ServiceURIManagement.NOW_VERSION + "/admin/**").hasRole("ADMIN")
@@ -66,6 +67,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .authenticationDetailsSource(authenticationDetailsSource)
                 .defaultSuccessUrl("/")
                 .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
                 .permitAll();
     }
 }

@@ -5,8 +5,10 @@ import com.junyharang.springsecurityformauth.domain.dto.request.SignUpRequestDTO
 import com.junyharang.springsecurityformauth.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +37,13 @@ public class UserController {
     }
 
     @GetMapping("/signin")
-    public String signIn() {
+    public String signIn(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "exception", required = false) String exception,
+            Model model) {
+
+        userService.signIn(error, exception, model);
+
         return "/signin";
     }
 

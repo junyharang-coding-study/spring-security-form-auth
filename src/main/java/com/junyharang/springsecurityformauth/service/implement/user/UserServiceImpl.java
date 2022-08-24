@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,5 +47,14 @@ import javax.servlet.http.HttpServletResponse;
             /* SecurityContextLogoutHandler 이용하여 Logout 처리 */
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
+    }
+
+    @Override
+    public void signIn(String error, String exception, Model model) {
+
+        /* model 객체에 error와 exception 내용 담아 전달 */
+        model.addAttribute("error", error);
+        model.addAttribute("exception", exception);
+
     }
 }
