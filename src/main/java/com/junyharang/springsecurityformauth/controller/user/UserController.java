@@ -53,4 +53,14 @@ public class UserController {
 
         return "redirect:/";
     }
+
+    @GetMapping("/denied")
+    public String accessDenied(
+            @RequestParam(value = "exception", required = false) String exception,
+            Model model) {
+
+        userService.accessDenied(exception, model);
+
+        return "/error/denied";
+    }
 }

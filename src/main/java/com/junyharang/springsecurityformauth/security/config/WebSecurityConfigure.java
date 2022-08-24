@@ -1,6 +1,8 @@
 package com.junyharang.springsecurityformauth.security.config;
 
 import com.junyharang.springsecurityformauth.constant.ServiceURIManagement;
+import com.junyharang.springsecurityformauth.security.common.FormAuthenticationDetailsSource;
+import com.junyharang.springsecurityformauth.security.handler.CustomAccessDeniedHandler;
 import com.junyharang.springsecurityformauth.security.provider.CustomAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -15,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -23,18 +26,24 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @Configuration
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
-    @Autowired private AuthenticationDetailsSource authenticationDetailsSource;
+    @Autowired private FormAuthenticationDetailsSource formAuthenticationDetailsSource;
     @Autowired private AuthenticationSuccessHandler authenticationSuccessHandler;
     @Autowired private AuthenticationFailureHandler authenticationFailureHandler;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
+    @Bean public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
+    @Bean public AuthenticationProvider authenticationProvider() {
         return new CustomAuthenticationProvider();
+    }
+
+    @Bean public AccessDeniedHandler accessDeniedHandler() {
+
+        CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
+        accessDeniedHandler.setErrorPage("/denied");
+
+        return accessDeniedHandler;
     }
 
     @Override
@@ -64,10 +73,14 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 /* 개발자가 만든 로그인 Page 관련 설정 */
                 .loginPage("/signin")
                 .loginProcessingUrl("/signin_proc")
-                .authenticationDetailsSource(authenticationDetailsSource)
+                .authenticationDetailsSource(formAuthenticationDetailsSource)
                 .defaultSuccessUrl("/")
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
-                .permitAll();
+                .permitAll()
+        .and()
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler());
+
     }
 }

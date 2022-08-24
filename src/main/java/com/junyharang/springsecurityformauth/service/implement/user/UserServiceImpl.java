@@ -57,4 +57,14 @@ import javax.servlet.http.HttpServletResponse;
         model.addAttribute("exception", exception);
 
     }
+
+    @Override
+    public void accessDenied(String exception, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Member member = (Member) authentication.getPrincipal();
+
+        model.addAttribute("username", member.getUsername());
+        model.addAttribute("exception", exception);
+    }
 }

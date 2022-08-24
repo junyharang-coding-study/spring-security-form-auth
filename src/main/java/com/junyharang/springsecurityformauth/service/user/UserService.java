@@ -12,4 +12,6 @@ public interface UserService {
     void logout(HttpServletRequest request, HttpServletResponse response);
 
     void signIn(String error, String exception, Model model);
+
+    void accessDenied(String exception, Model model);
 }
